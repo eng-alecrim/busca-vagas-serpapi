@@ -1,5 +1,7 @@
 # busca-vagas-serpapi
 
+> This project is licensed under the terms of the GNU General Public License v3.0 license.
+
 ## Guia de uso
 
 ``` python
