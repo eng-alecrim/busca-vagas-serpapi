@@ -1,7 +1,9 @@
 from functools import reduce
 from typing import Dict, List, Optional
-from busca_vagas_serpapi.schemas import RegistroVaga
+
 from pandas import DataFrame
+
+from busca_vagas_serpapi.schemas import RegistroVaga
 
 
 def get_qualificacoes(job: Dict) -> Optional[str]:
