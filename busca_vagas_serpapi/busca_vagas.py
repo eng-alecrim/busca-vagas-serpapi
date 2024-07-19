@@ -68,7 +68,7 @@ def loop_busca(busca: BuscaVaga) -> Optional[List[Dict]]:
     pagina = 0
     todas_vagas = []
 
-    LOGGER.info(f"loop_busca: Busca: '{busca.q}'.")
+    LOGGER.debug(f"loop_busca: Busca: '{busca.q}'.")
 
     while True:
         busca.start = str(10 * pagina)
@@ -78,8 +78,6 @@ def loop_busca(busca: BuscaVaga) -> Optional[List[Dict]]:
         todas_vagas += vagas
         pagina += 1
 
-    LOGGER.info(
-        f"loop_busca: Busca: '{busca.q}' -> {len(todas_vagas)} vaga(s)."
-    )
+    LOGGER.info(f"loop_busca: Busca: '{busca.q}' -> {len(todas_vagas)} vaga(s).")
 
     return todas_vagas
