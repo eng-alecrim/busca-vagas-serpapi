@@ -1,6 +1,19 @@
-from typing import Optional
+# =============================================================================
+# BIBLIOTECAS E MÓDULOS
+# =============================================================================
+
+from pathlib import Path
+from typing import List, Optional, Union
 
 from pydantic import BaseModel
+
+# =============================================================================
+# SCHEMAS
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Classe básica para realizar um request para o SerpAPI
+# -----------------------------------------------------------------------------
 
 
 class BuscaVaga(BaseModel):
@@ -27,6 +40,33 @@ class BuscaVaga(BaseModel):
     # Advanced Google Jobs Parameters
     lrad: Optional[str] = None  # search radius in kilometers
     ltype: Optional[str] = None  # filter the results by work from home
+
+
+# -----------------------------------------------------------------------------
+# Ajudar em buscas múltiplas
+# -----------------------------------------------------------------------------
+
+
+class FilaBuscas(BaseModel):
+    buscas: List[BuscaVaga]  # Lista de buscas a serem feitas
+    nomeArquivo: str  # Nome do arquivo empilhado
+    diretorioDestino: Union[Path, str]  # Diretório onde será salvo
+
+    def get_busca(self) -> BuscaVaga:
+        return self.buscas.pop(0)
+
+    def add_busca(self, busca: BuscaVaga) -> None:
+        self.buscas += [busca]
+        return None
+
+    def remove_busca(self, busca) -> None:
+        self.buscas.remove(busca)
+        return None
+
+
+# -----------------------------------------------------------------------------
+# Estrutura das informações que serão extraídas da busca -> gerar uma tabela
+# -----------------------------------------------------------------------------
 
 
 class RegistroVaga(BaseModel):
