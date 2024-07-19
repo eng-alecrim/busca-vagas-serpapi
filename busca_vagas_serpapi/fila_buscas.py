@@ -65,7 +65,7 @@ def empilha_fila(path_buscas: Union[str, Path], nome_arquivo: str) -> None:
     df = pd.concat(dfs).fillna("N/A")
     df.to_parquet(path_buscas.parent / f"{nome_arquivo}.parquet", index=False)
     shutil.rmtree(path_buscas)
-    LOGGER.debug(f"path_buscas: diretório temporário '{path_buscas}' removido.")
+    LOGGER.info(f"path_buscas: 🗑️ diretório temporário '{path_buscas}' removido.")
 
     return None
 
@@ -81,10 +81,10 @@ def pesquisa_fila(fila_buscas: FilaBuscas) -> None:
         if isinstance(fila_buscas.diretorioDestino, Path)
         else Path(fila_buscas.diretorioDestino)
     )
-    LOGGER.debug(f"pesquisa_fila: diretório destino -> '{dir_destino}'.")
+    LOGGER.debug(f"pesquisa_fila: 🛬 diretório destino -> '{dir_destino}'.")
     dir_temp = dir_destino / hashlib.md5(fila_buscas.nomeArquivo.encode()).hexdigest()
     dir_temp.mkdir(exist_ok=True, parents=True)
-    LOGGER.info(f"pesquisa_fila: '{dir_temp}' criado.")
+    LOGGER.info(f"pesquisa_fila: 📁 '{dir_temp}' criado.")
 
     i = 1
     n_erros = 0
@@ -93,41 +93,41 @@ def pesquisa_fila(fila_buscas: FilaBuscas) -> None:
     while fila_buscas.buscas:
         if n_erros < MAX_ERROS_CONSULTA:
             busca = fila_buscas.get_busca()
-            LOGGER.debug(f"pesquisa_fila: ({i}/{len_inicial})")
+            LOGGER.debug(f"pesquisa_fila: 🔄 ({i}/{len_inicial})")
             try:
                 resultados = loop_busca(busca)
-                assert resultados is not None, "pesquisa_fila: resultados is None"
+                assert resultados is not None, "pesquisa_fila: 💀 resultados is None"
 
                 vagas_busca = df_resultados(resultados)
                 vagas_busca["BUSCA"] = busca.q
-                LOGGER.debug("pesquisa_fila: DataFrame criado.")
+                LOGGER.debug("pesquisa_fila: 📝 DataFrame criado.")
 
                 path_destino = dir_temp / f"{fila_buscas.nomeArquivo}_{i}.parquet"
                 vagas_busca.to_parquet(path_destino, index=False)
-                LOGGER.info(f"pesquisa_fila: busca exportada para '{path_destino}'.")
+                LOGGER.info(f"pesquisa_fila: 🛸 busca exportada para '{path_destino}'.")
 
-                LOGGER.info(f"pesquisa_fila: '{busca.q}' removido da fila.")
+                LOGGER.info(f"pesquisa_fila: 🗑️ '{busca.q}' removido da fila.")
 
                 i += 1
                 n_erros = 0
 
             except Exception as e:
-                LOGGER.warning(f"pesquisa_fila: AVISO! {e}")
+                LOGGER.warning(f"pesquisa_fila: 🚨 AVISO! {e}")
                 fila_buscas.add_busca(busca)
                 n_erros += 1
         else:
             salva_fila(fila_buscas, dir_temp)
-            LOGGER.warning(
-                f"pesquisa_fila: ERRO! Fila foi salva em '{dir_temp}/fila.pkl'."
+            LOGGER.error(
+                f"pesquisa_fila: 💀 ERRO! Fila foi salva em '{dir_temp}/fila.pkl'."
             )
             busca = fila_buscas.get_busca()
             raise RecursionError(
-                f"pesquisa_fila: ERRO! A busca '{busca.q}' falhou mais de 5 vezes!"
+                f"pesquisa_fila: 💀 ERRO! A busca '{busca.q}' falhou mais de 5 vezes!"
             )
 
     empilha_fila(dir_temp, fila_buscas.nomeArquivo)
     LOGGER.info(
-        f"pesquisa_fila: Vagas empilhadas e salvas em '{dir_destino / fila_buscas.nomeArquivo}.parquet'."
+        f"pesquisa_fila: 🏁 Vagas empilhadas e salvas em '{dir_destino / fila_buscas.nomeArquivo}.parquet'."
     )
 
     return None

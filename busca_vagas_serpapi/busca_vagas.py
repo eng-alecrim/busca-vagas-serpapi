@@ -43,14 +43,14 @@ def resultados_busca(results: Dict) -> Optional[List[Dict]]:
         erro = results.get("error", "")
         if "returned any results" in erro:
             return None
-        LOGGER.warning(f"resultados_busca: WARNING! {erro}.")
+        LOGGER.warning(f"resultados_busca: 🚨 AVISO! {erro}.")
         return None
 
     data_criacao = results.get("search_metadata", {}).get("created_at")
-    assert data_criacao is not None, "resultados_busca: data_criacao is None"
+    assert data_criacao is not None, "resultados_busca: 💀 data_criacao is None"
 
     jobs = results.get("jobs_results")
-    assert jobs is not None, "resultados_busca: jobs is None"
+    assert jobs is not None, "resultados_busca: 💀 jobs is None"
 
     def add_data_criacao(job: Dict) -> Dict:
         job["created_at"] = data_criacao
@@ -68,7 +68,7 @@ def loop_busca(busca: BuscaVaga) -> Optional[List[Dict]]:
     pagina = 0
     todas_vagas = []
 
-    LOGGER.debug(f"loop_busca: Busca: '{busca.q}'.")
+    LOGGER.debug(f"loop_busca: 🔎 Busca: '{busca.q}'.")
 
     while True:
         busca.start = str(10 * pagina)
@@ -78,6 +78,6 @@ def loop_busca(busca: BuscaVaga) -> Optional[List[Dict]]:
         todas_vagas += vagas
         pagina += 1
 
-    LOGGER.info(f"loop_busca: Busca: '{busca.q}' -> {len(todas_vagas)} vaga(s).")
+    LOGGER.info(f"loop_busca: 🏁 {len(todas_vagas)} vaga(s).")
 
     return todas_vagas
