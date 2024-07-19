@@ -1,0 +1,7 @@
+buscaBrasil:
+  engine: google_jobs
+  lrad: "10"
+  google_domain: google.com.br
+  gl: br
+  hl: pt
+  location: Brazil

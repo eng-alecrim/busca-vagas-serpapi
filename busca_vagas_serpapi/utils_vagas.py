@@ -2,12 +2,24 @@
 # BIBLIOTECAS E MÓDULOS
 # =============================================================================
 
+import os
 from functools import reduce
+from pathlib import Path
 from typing import Dict, List, Optional
 
+import yaml
+from dotenv import find_dotenv, load_dotenv
 from pandas import DataFrame
 
 from busca_vagas_serpapi.schemas import RegistroVaga
+from busca_vagas_serpapi.utils import get_path_projeto
+
+load_dotenv(find_dotenv())
+API_SERPAPI = os.getenv("API_SERPAPI", "")
+
+DIR_PROJETO = get_path_projeto()
+assert isinstance(DIR_PROJETO, Path)
+PATH_PARAMETROS_BUSCAS = DIR_PROJETO / "config/parametros_buscas.yaml"
 
 # =============================================================================
 # FUNÇÕES
@@ -122,3 +134,26 @@ def gera_df_resultados(resultados_tratados: List[RegistroVaga]) -> DataFrame:
 
 def df_resultados(resultados: List[Dict]) -> DataFrame:
     return gera_df_resultados(trata_resultados(resultados))
+
+
+# -----------------------------------------------------------------------------
+# Obtém os parâmetros da API a partir do arquivo de configuração
+# -----------------------------------------------------------------------------
+
+
+def get_parametros_busca(chave: str, api_key: str = API_SERPAPI) -> Dict[str, str]:
+    if not api_key:
+        raise ValueError("get_parametros_busca: 💀 ERRO! FORNEÇA A CHAVE DA API!")
+
+    # Carregando as configs
+    with open(PATH_PARAMETROS_BUSCAS, "r") as file:
+        parametros_buscas = yaml.safe_load(file)
+    parametros = parametros_buscas.get(chave)
+
+    if parametros:
+        parametros["api_key"] = api_key
+        return parametros
+
+    raise ValueError(
+        f"get_parametros_busca: 💀 ERRO! Configuração '{chave}' não encontrada!"
+    )

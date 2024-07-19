@@ -2,13 +2,32 @@
 # BIBLIOTECAS E MÓDULOS
 # =============================================================================
 
+import os
 import re
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from pathlib import Path
+from typing import Callable, Optional, Union
+
+from dotenv import find_dotenv, load_dotenv
 
 # =============================================================================
 # FUNÇÕES
 # =============================================================================
+
+load_dotenv(find_dotenv())
+NOME_PROJETO = os.getenv("NOME_PROJETO", "")
+
+
+def get_path_projeto(
+    dir_atual: Path = Path.cwd(), nome_projeto: str = NOME_PROJETO
+) -> Union[Callable, Path]:
+    if not nome_projeto:
+        raise ValueError("get_path_projeto: 💀 ERRO! nome_projeto deve ser fornecido!")
+    if dir_atual.name == nome_projeto:
+        return dir_atual
+
+    return get_path_projeto(dir_atual.parent, nome_projeto)
+
 
 # -----------------------------------------------------------------------------
 # Transformar a data relativa em uma data absoluta
