@@ -1,9 +1,21 @@
+# =============================================================================
+# BIBLIOTECAS E MÓDULOS
+# =============================================================================
+
 from functools import reduce
 from typing import Dict, List, Optional
 
 from pandas import DataFrame
 
 from busca_vagas_serpapi.schemas import RegistroVaga
+
+# =============================================================================
+# FUNÇÕES
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Função para obter as qualificações da vaga
+# -----------------------------------------------------------------------------
 
 
 def get_qualificacoes(job: Dict) -> Optional[str]:
@@ -20,6 +32,11 @@ def get_qualificacoes(job: Dict) -> Optional[str]:
     return None
 
 
+# -----------------------------------------------------------------------------
+# Função para obter as responsabilidades da vaga
+# -----------------------------------------------------------------------------
+
+
 def get_responsabilidades(job: Dict) -> Optional[str]:
     highlights = job.get("job_highlights")
     if highlights is None:
@@ -32,6 +49,11 @@ def get_responsabilidades(job: Dict) -> Optional[str]:
             return responsabilidades
 
     return None
+
+
+# -----------------------------------------------------------------------------
+# Função para obter os benefícios da vaga
+# -----------------------------------------------------------------------------
 
 
 def get_beneficios(job: Dict) -> Optional[str]:
@@ -47,6 +69,10 @@ def get_beneficios(job: Dict) -> Optional[str]:
 
     return None
 
+
+# -----------------------------------------------------------------------------
+# Função para gerar um registro de vaga
+# -----------------------------------------------------------------------------
 
 gera_registro = lambda job: RegistroVaga(
     ID_VAGA=job.get("job_id"),
@@ -64,6 +90,10 @@ gera_registro = lambda job: RegistroVaga(
     BENEFICIOS=get_beneficios(job),
 )
 
+# -----------------------------------------------------------------------------
+# Função para tratar os resultados e gerar uma lista de registros de vagas
+# -----------------------------------------------------------------------------
+
 
 def trata_resultados(resultados: List[Dict]) -> List[RegistroVaga]:
     return reduce(
@@ -74,8 +104,20 @@ def trata_resultados(resultados: List[Dict]) -> List[RegistroVaga]:
     )
 
 
+# -----------------------------------------------------------------------------
+# Função para gerar um DataFrame a partir dos resultados tratados
+# -----------------------------------------------------------------------------
+
+
 def gera_df_resultados(resultados_tratados: List[RegistroVaga]) -> DataFrame:
-    return DataFrame([res.model_dump() for res in resultados_tratados])
+    df = DataFrame([res.model_dump() for res in resultados_tratados])
+    df["REMOTO"] = df["REMOTO"].astype(str)
+    return df
+
+
+# -----------------------------------------------------------------------------
+# Função para gerar um DataFrame a partir dos resultados brutos
+# -----------------------------------------------------------------------------
 
 
 def df_resultados(resultados: List[Dict]) -> DataFrame:
