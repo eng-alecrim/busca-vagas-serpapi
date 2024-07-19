@@ -58,14 +58,18 @@ def load_fila(path_fila_buscas: Union[str, Path]) -> FilaBuscas:
 
 
 def empilha_fila(path_buscas: Union[str, Path], nome_arquivo: str) -> None:
-    path_buscas = path_buscas if isinstance(path_buscas, Path) else Path(path_buscas)
+    path_buscas = (
+        path_buscas if isinstance(path_buscas, Path) else Path(path_buscas)
+    )
     arquivos = path_buscas.rglob("*.parquet")
     f_reduce = lambda dfs, path_: dfs + [pd.read_parquet(path_)]
     dfs = reduce(f_reduce, arquivos, [])
     df = pd.concat(dfs).fillna("N/A")
     df.to_parquet(path_buscas.parent / f"{nome_arquivo}.parquet", index=False)
     shutil.rmtree(path_buscas)
-    LOGGER.info(f"path_buscas: 🗑️ diretório temporário '{path_buscas}' removido.")
+    LOGGER.info(
+        f"path_buscas: 🗑️ diretório temporário '{path_buscas}' removido."
+    )
 
     return None
 
@@ -82,7 +86,9 @@ def pesquisa_fila(fila_buscas: FilaBuscas) -> None:
         else Path(fila_buscas.diretorioDestino)
     )
     LOGGER.debug(f"pesquisa_fila: 🛬 diretório destino -> '{dir_destino}'.")
-    dir_temp = dir_destino / hashlib.md5(fila_buscas.nomeArquivo.encode()).hexdigest()
+    dir_temp = (
+        dir_destino / hashlib.md5(fila_buscas.nomeArquivo.encode()).hexdigest()
+    )
     dir_temp.mkdir(exist_ok=True, parents=True)
     LOGGER.info(f"pesquisa_fila: 📁 '{dir_temp}' criado.")
 
@@ -96,15 +102,21 @@ def pesquisa_fila(fila_buscas: FilaBuscas) -> None:
             LOGGER.debug(f"pesquisa_fila: 🔄 ({i}/{len_inicial})")
             try:
                 resultados = loop_busca(busca)
-                assert resultados is not None, "pesquisa_fila: 💀 resultados is None"
+                assert (
+                    resultados is not None
+                ), "pesquisa_fila: 💀 resultados is None"
 
                 vagas_busca = df_resultados(resultados)
                 vagas_busca["BUSCA"] = busca.q
                 LOGGER.debug("pesquisa_fila: 📝 DataFrame criado.")
 
-                path_destino = dir_temp / f"{fila_buscas.nomeArquivo}_{i}.parquet"
+                path_destino = (
+                    dir_temp / f"{fila_buscas.nomeArquivo}_{i}.parquet"
+                )
                 vagas_busca.to_parquet(path_destino, index=False)
-                LOGGER.info(f"pesquisa_fila: 🛸 busca exportada para '{path_destino}'.")
+                LOGGER.info(
+                    f"pesquisa_fila: 🛸 busca exportada para '{path_destino}'."
+                )
 
                 LOGGER.info(f"pesquisa_fila: 🗑️ '{busca.q}' removido da fila.")
 

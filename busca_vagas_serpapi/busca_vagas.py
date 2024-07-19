@@ -47,7 +47,9 @@ def resultados_busca(results: Dict) -> Optional[List[Dict]]:
         return None
 
     data_criacao = results.get("search_metadata", {}).get("created_at")
-    assert data_criacao is not None, "resultados_busca: 💀 data_criacao is None"
+    assert (
+        data_criacao is not None
+    ), "resultados_busca: 💀 data_criacao is None"
 
     jobs = results.get("jobs_results")
     assert jobs is not None, "resultados_busca: 💀 jobs is None"
