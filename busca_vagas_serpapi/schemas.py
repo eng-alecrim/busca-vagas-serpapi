@@ -33,8 +33,8 @@ class BuscaVaga(BaseModel):
     hl: Optional[str] = None  # the language to use for the Google Jobs search
 
     # Pagination
-    start: Optional[str] = (
-        None  # result offset (0 -> 1a pag, 10 -> 2a pag, 20 -> 3a pag, . . .)
+    next_page_token: Optional[str] = (
+        None  # Parameter defines the next page token. It is used for retrieving the next page of results. Up to 10 results are returned per page.
     )
 
     # Advanced Google Jobs Parameters
