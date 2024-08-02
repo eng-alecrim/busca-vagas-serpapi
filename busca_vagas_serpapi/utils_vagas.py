@@ -11,11 +11,18 @@ import yaml
 from dotenv import find_dotenv, load_dotenv
 from pandas import DataFrame
 
-from busca_vagas_serpapi.schemas import RegistroVaga
-from busca_vagas_serpapi.utils import get_path_projeto
+from .schemas import RegistroVaga
+from .utils import get_path_projeto
+
+# =============================================================================
+# CONSTANTES
+# =============================================================================
 
 load_dotenv(find_dotenv())
 API_SERPAPI = os.getenv("API_SERPAPI", "")
+assert (
+    API_SERPAPI is not None
+), "utils_vagas: FORNEÇA A CHAVE DA API NO ARQUIVO .env!"
 
 DIR_PROJETO = get_path_projeto()
 assert isinstance(DIR_PROJETO, Path)
@@ -141,12 +148,16 @@ def df_resultados(resultados: List[Dict]) -> DataFrame:
 # -----------------------------------------------------------------------------
 
 
-def get_parametros_busca(chave: str, api_key: str = API_SERPAPI) -> Dict[str, str]:
+def get_parametros_busca(
+    chave: str, api_key: str = API_SERPAPI
+) -> Dict[str, str]:
     if not api_key:
-        raise ValueError("get_parametros_busca: 💀 ERRO! FORNEÇA A CHAVE DA API!")
+        raise ValueError(
+            "get_parametros_busca: 💀 ERRO! FORNEÇA A CHAVE DA API!"
+        )
 
     # Carregando as configs
-    with open(PATH_PARAMETROS_BUSCAS, "r") as file:
+    with open(file=PATH_PARAMETROS_BUSCAS, mode="r", encoding="utf-8") as file:
         parametros_buscas = yaml.safe_load(file)
     parametros = parametros_buscas.get(chave)
 

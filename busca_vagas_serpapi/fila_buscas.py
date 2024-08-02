@@ -14,9 +14,9 @@ from typing import Union
 
 import pandas as pd
 
-from busca_vagas_serpapi.busca_vagas import loop_busca
-from busca_vagas_serpapi.schemas import FilaBuscas
-from busca_vagas_serpapi.utils_vagas import df_resultados
+from .busca_vagas import loop_busca
+from .schemas import FilaBuscas
+from .utils_vagas import df_resultados
 
 # =============================================================================
 # CONSTANTES

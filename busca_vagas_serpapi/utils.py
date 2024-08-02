@@ -22,7 +22,9 @@ def get_path_projeto(
     dir_atual: Path = Path.cwd(), nome_projeto: str = NOME_PROJETO
 ) -> Union[Callable, Path]:
     if not nome_projeto:
-        raise ValueError("get_path_projeto: 💀 ERRO! nome_projeto deve ser fornecido!")
+        raise ValueError(
+            "get_path_projeto: 💀 ERRO! nome_projeto deve ser fornecido!"
+        )
     if dir_atual.name == nome_projeto:
         return dir_atual
 
