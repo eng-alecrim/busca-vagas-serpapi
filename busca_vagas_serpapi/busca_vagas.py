@@ -4,17 +4,22 @@
 
 import logging
 import logging.config
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 from serpapi import GoogleSearch
 
-from busca_vagas_serpapi.schemas import BuscaVaga
+from .schemas import BuscaVaga
+from .utils import get_path_projeto
 
 # =============================================================================
 # CONSTANTES
 # =============================================================================
 
-logging.config.fileConfig("config/logging.toml")
+DIR_PROJETO = get_path_projeto()
+assert isinstance(DIR_PROJETO, Path)
+
+logging.config.fileConfig(DIR_PROJETO / "config/logging.toml")
 LOGGER = logging.getLogger("logMain.info.debug")
 
 # =============================================================================
@@ -49,13 +54,19 @@ def resultados_busca(results: Dict) -> Tuple[Optional[List[Dict]], str]:
         return None, ""
 
     data_criacao = results.get("search_metadata", {}).get("created_at")
-    assert data_criacao is not None, "resultados_busca: 💀 data_criacao is None"
+    assert (
+        data_criacao is not None
+    ), "resultados_busca: 💀 data_criacao is None"
 
     jobs = results.get("jobs_results")
     assert jobs is not None, "resultados_busca: 💀 jobs is None"
 
-    next_page_token = results.get("serpapi_pagination", {}).get("next_page_token")
-    assert next_page_token is not None, "resultados_busca: 💀 next_page_token is None"
+    next_page_token = results.get("serpapi_pagination", {}).get(
+        "next_page_token"
+    )
+    assert (
+        next_page_token is not None
+    ), "resultados_busca: 💀 next_page_token is None"
 
     def add_data_criacao(job: Dict) -> Dict:
         job["created_at"] = data_criacao
@@ -78,9 +89,12 @@ def loop_busca(busca: BuscaVaga) -> Optional[List[Dict]]:
     while True:
         busca.next_page_token = next_page_token
         vagas, next_page_token = resultados_busca(faz_busca(busca))
-        if vagas is None:
+
+        if vagas:
+            todas_vagas += vagas
+
+        if vagas is None or next_page_token is None:
             break
-        todas_vagas += vagas
 
     LOGGER.info(f"loop_busca: 🏁 {len(todas_vagas)} vaga(s).")
 
